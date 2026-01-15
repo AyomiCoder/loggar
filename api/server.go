@@ -44,6 +44,7 @@ func NewServer() *gin.Engine {
 	auth := router.Group("/auth")
 	{
 		auth.POST("/login", handlers.LoginHandler)
+		auth.POST("/register", handlers.RegisterHandler)
 	}
 
 	// Protected routes (require JWT)

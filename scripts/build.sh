@@ -4,7 +4,7 @@
 set -e
 
 VERSION="0.1.0"
-APP_NAME="triage"
+APP_NAME="loggar"
 BUILD_DIR="dist"
 
 echo "Building Loggar CLI v${VERSION}..."

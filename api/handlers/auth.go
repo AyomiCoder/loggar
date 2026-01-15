@@ -28,6 +28,40 @@ func SetDB(database *sql.DB) {
 	db = database
 }
 
+type RegisterRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+// RegisterHandler handles user registration
+func RegisterHandler(c *gin.Context) {
+	var req RegisterRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request: email must be valid and password at least 6 characters"})
+		return
+	}
+
+	// Hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process password"})
+		return
+	}
+
+	// Insert user into database
+	var userID int
+	err = db.QueryRow("INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id",
+		req.Email, string(hashedPassword)).Scan(&userID)
+
+	if err != nil {
+		// Check for duplicate email
+		c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "user registered successfully", "email": req.Email})
+}
+
 // LoginHandler handles user authentication
 func LoginHandler(c *gin.Context) {
 	var req LoginRequest

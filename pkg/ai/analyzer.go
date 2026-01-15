@@ -78,7 +78,7 @@ Logs to analyze:
 // callGoogleAI makes the API call to Google AI Studio
 func callGoogleAI(apiKey, prompt string) (string, error) {
 	// Using Google AI Studio Gemini API
-	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=%s", apiKey)
+	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=%s", apiKey)
 
 	requestBody := map[string]interface{}{
 		"contents": []map[string]interface{}{
@@ -134,5 +134,24 @@ func callGoogleAI(apiKey, prompt string) (string, error) {
 		return "", fmt.Errorf("no response from AI")
 	}
 
-	return aiResponse.Candidates[0].Content.Parts[0].Text, nil
+	text := aiResponse.Candidates[0].Content.Parts[0].Text
+
+	// Sanitize response (remove possible markdown code blocks)
+	text = sanitizeJSON(text)
+
+	return text, nil
+}
+
+func sanitizeJSON(input string) string {
+	// Remove ```json and ``` if present
+	if len(input) > 7 && input[:7] == "```json" {
+		input = input[7:]
+	}
+	if len(input) > 3 && input[:3] == "```" {
+		input = input[3:]
+	}
+	if len(input) > 3 && input[len(input)-3:] == "```" {
+		input = input[:len(input)-3]
+	}
+	return input
 }

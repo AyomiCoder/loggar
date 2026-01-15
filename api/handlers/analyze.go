@@ -26,5 +26,5 @@ func AnalyzeHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.IndentedJSON(http.StatusOK, result)
 }

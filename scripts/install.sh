@@ -4,7 +4,7 @@
 set -e
 
 INSTALL_DIR="/usr/local/bin"
-BINARY_NAME="triage"
+BINARY_NAME="loggar"
 GITHUB_REPO="AyomiCoder/loggar"
 VERSION="latest"
 
@@ -56,4 +56,4 @@ else
 fi
 
 echo "✓ Loggar CLI installed successfully!"
-echo "Run 'triage --help' to get started"
+echo "Run 'loggar --help' to get started"

@@ -1,6 +1,8 @@
 package output
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -82,7 +84,13 @@ func PrintAnalysis(result *AnalysisResult) {
 	fmt.Println(separator)
 }
 
-// PrintJSON prints the raw JSON output
+// PrintJSON prints the raw JSON output with indentation
 func PrintJSON(jsonData string) {
-	fmt.Println(jsonData)
+	var out bytes.Buffer
+	err := json.Indent(&out, []byte(jsonData), "", "  ")
+	if err != nil {
+		fmt.Println(jsonData)
+		return
+	}
+	fmt.Println(out.String())
 }
