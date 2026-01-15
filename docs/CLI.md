@@ -97,23 +97,20 @@ Analyze log files or stdin input to identify issues and get AI-powered recommend
 loggar analyze server.log
 ```
 **Sample response:**
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PRIMARY ISSUE
-→ database connection failure (connection refused)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECONDARY EFFECTS
-• auth service timeouts
-• payment processing failures
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-LIKELY CAUSES
-1. postgresql service is stopped or crashed (90%)
-2. resource exhaustion on database host (70%)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RECOMMENDED ACTIONS
-• verify status of database service on port 5432
-• check host cpu and memory utilization
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```bash
+💡 Application failed to start because it couldn't reach the database on port 5432.
+
+WHATS BROKEN
+• connection refused on 127.0.0.1:5432
+• postgresql health check failed
+
+ROOT CAUSE
+1. postgresql service is likely stopped or crashed (95%)
+2. network config error or local firewall blocking port (15%)
+
+HOW TO FIX
+• check postgres status with systemctl or brew services
+• verify port 5432 is listening
 ```
 
 #### From stdin:
@@ -122,23 +119,20 @@ cat error.log | loggar analyze
 ```
 
 **Sample response:**
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PRIMARY ISSUE
-→ database connection failure (connection refused)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECONDARY EFFECTS
-• auth service timeouts
-• payment processing failures
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-LIKELY CAUSES
-1. postgresql service is stopped or crashed (90%)
-2. resource exhaustion on database host (70%)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RECOMMENDED ACTIONS
-• verify status of database service on port 5432
-• check host cpu and memory utilization
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```bash
+💡 Application failed to start because it couldn't reach the database on port 5432.
+
+WHATS BROKEN
+• connection refused on 127.0.0.1:5432
+• postgresql health check failed
+
+ROOT CAUSE
+1. postgresql service is likely stopped or crashed (95%)
+2. network config error or local firewall blocking port (15%)
+
+HOW TO FIX
+• check postgres status with systemctl or brew services
+• verify port 5432 is listening
 ```
 
 #### JSON output:
@@ -148,28 +142,31 @@ loggar analyze server.log --json
 **Sample response:**
 ```json
 {
-  "primary_issue": "Service crash due to Java OutOfMemoryError (Heap Space)",
-  "secondary_effects": [
-    "Service failed to auto-restart",
-    "Container resource limit reached (memory)"
-  ],
-  "first_seen": "2026-01-15T17:05:44Z",
-  "likely_causes": [
+  "summary": "Service crash due to Java OutOfMemoryError (Heap Space)",
+  "sections": [
     {
-      "cause": "Insufficient Java heap space configuration for current workload",
-      "confidence": 1.0
+      "title": "WHATS BROKEN",
+      "content": [
+        "Service failed to auto-restart",
+        "Container resource limit reached (memory)"
+      ]
     },
     {
-      "cause": "Container memory limits are set too low",
-      "confidence": 0.9
+      "title": "ROOT CAUSE",
+      "content": [
+        "Insufficient Java heap space configuration for current workload (100%)",
+        "Container memory limits are set too low (90%)"
+      ]
+    },
+    {
+      "title": "HOW TO FIX",
+      "content": [
+        "Increase Java heap size configuration (-Xmx)",
+        "Review and increase container memory limits",
+        "Analyze memory usage patterns for potential leaks"
+      ]
     }
-  ],
-  "recommended_actions": [
-    "Increase Java heap size configuration (-Xmx)",
-    "Review and increase container memory limits",
-    "Analyze memory usage patterns for potential leaks"
-  ],
-  "similar_past_incidents": []
+  ]
 }
 ```
 
@@ -181,20 +178,17 @@ loggar analyze server.log --verbose
 ```bash
 → Analyzing 323 bytes of logs...
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PRIMARY ISSUE
-→ database connection failure (connection refused)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECONDARY EFFECTS
-• auth service timeouts
-• payment processing failures
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-LIKELY CAUSES
-1. postgresql service is stopped or crashed (90%)
-2. resource exhaustion on database host (70%)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RECOMMENDED ACTIONS
-• verify status of database service on port 5432
-• check host cpu and memory utilization
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 Application failed to start because it couldn't reach the database on port 5432.
+
+WHATS BROKEN
+• connection refused on 127.0.0.1:5432
+• postgresql health check failed
+
+ROOT CAUSE
+1. postgresql service is likely stopped or crashed (95%)
+2. network config error or local firewall blocking port (15%)
+
+HOW TO FIX
+• check postgres status with systemctl or brew services
+• verify port 5432 is listening
 ```
