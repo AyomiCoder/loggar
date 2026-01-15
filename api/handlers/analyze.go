@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/ayomide/loggar/pkg/ai"
+	"github.com/AyomiCoder/loggar/pkg/ai"
 	"github.com/gin-gonic/gin"
 )
 

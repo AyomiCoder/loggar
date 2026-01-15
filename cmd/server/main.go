@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ayomide/loggar/api"
+	"github.com/AyomiCoder/loggar/api"
 	"github.com/joho/godotenv"
 )
 

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/ayomide/loggar/api/handlers"
-	"github.com/ayomide/loggar/api/middleware"
+	"github.com/AyomiCoder/loggar/api/handlers"
+	"github.com/AyomiCoder/loggar/api/middleware"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )

@@ -5,7 +5,7 @@ set -e
 
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="triage"
-GITHUB_REPO="ayomide/loggar"
+GITHUB_REPO="AyomiCoder/loggar"
 VERSION="latest"
 
 echo "Installing Loggar CLI..."

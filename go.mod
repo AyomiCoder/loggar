@@ -1,4 +1,4 @@
-module github.com/ayomide/loggar
+module github.com/AyomiCoder/loggar
 
 go 1.25.5
 
@@ -6,6 +6,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/gin-gonic/gin v1.11.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/spf13/cobra v1.10.2
 	golang.org/x/crypto v0.40.0
