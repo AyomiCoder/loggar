@@ -13,7 +13,7 @@ curl -fsSL https://raw.githubusercontent.com/AyomiCoder/loggar/main/scripts/inst
 
 ### Homebrew
 ```bash
-brew tap AyomiCoder/loggar
+brew tap AyomiCoder/loggar https://github.com/AyomiCoder/loggar
 brew install loggar
 ```
 

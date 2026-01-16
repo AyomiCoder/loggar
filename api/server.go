@@ -36,9 +36,12 @@ func NewServer() *gin.Engine {
 	router := gin.Default()
 
 	// Health check endpoint
-	router.GET("/health", func(c *gin.Context) {
+	// Health check endpoint
+	healthHandler := func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
-	})
+	}
+	router.GET("/health", healthHandler)
+	router.HEAD("/health", healthHandler)
 
 	// Authentication routes
 	auth := router.Group("/auth")
