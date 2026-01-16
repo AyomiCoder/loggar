@@ -4,6 +4,19 @@ ai-powered log triage. terminal-first.
 
 loggar helps developers analyze server logs directly in their terminal, identifying root causes, secondary effects, and recommended actions using ai.
 
+## Installation
+
+### Curl (macOS/Linux)
+```bash
+curl -fsSL https://raw.githubusercontent.com/AyomiCoder/loggar/main/scripts/install.sh | sh
+```
+
+### Homebrew
+```bash
+brew tap AyomiCoder/loggar
+brew install loggar
+```
+
 ## Documentation
 
 Full documentation available at [loggar.dev/docs](https://loggar.dev/docs.html)
