@@ -19,6 +19,7 @@ import (
 )
 
 var db *sql.DB
+
 func SetDB(database *sql.DB) {
 	db = database
 }
@@ -34,7 +35,7 @@ func getGithubOauthConfig() *oauth2.Config {
 	}
 	apiURL := os.Getenv("API_URL")
 	if apiURL == "" {
-		apiURL = "http://localhost:8080"
+		apiURL = "https://loggar-ai.onrender.com"
 	}
 	githubOauthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
@@ -52,7 +53,7 @@ func getGoogleOauthConfig() *oauth2.Config {
 	}
 	apiURL := os.Getenv("API_URL")
 	if apiURL == "" {
-		apiURL = "http://localhost:8080"
+		apiURL = "https://loggar-ai.onrender.com"
 	}
 	googleOauthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
