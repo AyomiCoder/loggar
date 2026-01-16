@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -103,45 +104,95 @@ func lineDelay() {
 	time.Sleep(150 * time.Millisecond)
 }
 
+// highlightLine applies colors to specific patterns in the text
+func highlightLine(text string) string {
+	// Highlighting rules
+	// 1. Durations and Percentages (e.g. 104ms, 10-15s, 98%) -> Yellow
+	text = replacePattern(text, `\b\d+(?:\.\d+)?(?:ms|s|%|kb|mb)\b`, color.New(color.FgHiYellow).SprintFunc())
+
+	// 2. IDs and Codes (e.g. TX_9921, user_99a82, /v1/payment_intents) -> Cyan
+	text = replacePattern(text, `\b[A-Za-z0-9_/-]{4,}\d+[A-Za-z0-9_/-]*\b`, color.New(color.FgHiCyan).SprintFunc())
+
+	// 3. Quoted text -> Cyan
+	text = replacePattern(text, `"[^"]+"`, color.New(color.FgHiCyan).SprintFunc())
+
+	// 4. Severity words -> Red
+	text = replacePattern(text, `(?i)\b(timeout|failed|failure|error|critical|collapsed|prohibited|refused)\b`, color.New(color.FgHiRed).SprintFunc())
+
+	// 5. Success words -> Green
+	text = replacePattern(text, `(?i)\b(success|resolved|healthy|stable|ok)\b`, color.New(color.FgHiGreen).SprintFunc())
+
+	return text
+}
+
+// replacePattern is a helper to replace regex matches with a colored version
+func replacePattern(text string, pattern string, colorFunc func(a ...interface{}) string) string {
+	re := regexp.MustCompile(pattern)
+	return re.ReplaceAllStringFunc(text, func(match string) string {
+		return colorFunc(match)
+	})
+}
+
 // PrintAnalysis prints the analysis result in a pretty terminal format with a progressive effect
 func PrintAnalysis(result *AnalysisResult) {
-	// Colors
-	titleColor := color.New(color.FgCyan, color.Bold)
-	summaryColor := color.New(color.FgHiWhite, color.Italic)
-	bulletColor := color.New(color.FgHiWhite)               // Toned down from yellow to white
-	versionColor := color.New(color.FgHiBlack, color.Faint) // Faint for footer
+	// Structural Colors
+	titleColor := color.New(color.FgHiMagenta, color.Bold)
+	summaryColor := color.New(color.FgWhite) // Cleaner white
+	bulletColor := color.New(color.FgHiYellow)
+	arrowColor := color.New(color.FgHiRed)
+	versionColor := color.New(color.FgHiBlack, color.Faint)
 
 	termWidth := getTermWidth()
 
-	fmt.Println() // Start with a newline
+	fmt.Println()
 
 	// Summary
 	if result.Summary != "" {
 		summaryColor.Print("💡 ")
 		lines := wrapText(result.Summary, termWidth-3, "   ")
-		slowPrintWrapped(lines, 12*time.Millisecond)
+		// Highlight summary content
+		for i, line := range lines {
+			lines[i] = highlightLine(line)
+		}
+		slowPrintWrapped(lines, 5*time.Millisecond) // Faster typing
 		lineDelay()
 	}
 
 	// Dynamic Sections
 	for _, section := range result.Sections {
-		titleColor.Println(strings.ToUpper(section.Title))
+		// Colorize title based on content?
+		tColor := titleColor
+		if strings.Contains(strings.ToUpper(section.Title), "RESOLUTION") {
+			tColor = color.New(color.FgHiBlue, color.Bold)
+		}
+
+		tColor.Println(strings.ToUpper(section.Title))
+
 		for _, item := range section.Content {
-			// Determine bullet and clean item
 			bullet := "• "
 			cleanItem := item
+			var bColor *color.Color = bulletColor
+
 			if strings.HasPrefix(item, "→") {
 				bullet = "→ "
 				cleanItem = strings.TrimSpace(strings.TrimPrefix(item, "→"))
+				bColor = arrowColor
 			} else if strings.HasPrefix(item, "•") {
 				bullet = "• "
 				cleanItem = strings.TrimSpace(strings.TrimPrefix(item, "•"))
 			}
 
-			bulletColor.Print(bullet)
-			// Wrap item content with indent to align with bullet
+			bColor.Print(bullet)
+
+			// Wrap item content
 			lines := wrapText(cleanItem, termWidth-3, "  ")
-			slowPrintWrapped(lines, 40*time.Millisecond)
+
+			// Highlight content in lines
+			for i := range lines {
+				lines[i] = highlightLine(lines[i])
+			}
+
+			slowPrintWrapped(lines, 15*time.Millisecond) // Faster typing
 		}
 		lineDelay()
 		fmt.Println()
