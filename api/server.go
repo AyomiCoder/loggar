@@ -40,11 +40,13 @@ func NewServer() *gin.Engine {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	// Authentication routes (no auth required)
+	// Authentication routes
 	auth := router.Group("/auth")
 	{
-		auth.POST("/login", handlers.LoginHandler)
-		auth.POST("/register", handlers.RegisterHandler)
+		auth.GET("/github", handlers.AuthGitHubHandler)
+		auth.GET("/github/callback", handlers.AuthGitHubCallbackHandler)
+		auth.GET("/google", handlers.AuthGoogleHandler)
+		auth.GET("/google/callback", handlers.AuthGoogleCallbackHandler)
 	}
 
 	// Protected routes (require JWT)

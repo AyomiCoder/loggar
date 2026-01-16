@@ -8,7 +8,9 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
+    password_hash TEXT, -- Nullable for OAuth users
+    provider TEXT, -- 'github', 'google', or NULL (for legacy)
+    provider_id TEXT, -- User ID from provider
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );

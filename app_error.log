@@ -1,0 +1,10 @@
+[2026-01-15T19:06:13.385Z] INFO: User user_99a82 starting checkout flow for 1 items
+[2026-01-15T19:06:13.393Z] DEBUG: Validating inventory for item prod_k29...
+[2026-01-15T19:06:13.393Z] DEBUG: Initiating payment of 299.99 USD...
+[2026-01-15T19:06:13.497Z] ERROR: Checkout failed for user user_99a82!
+[2026-01-15T19:06:13.497Z] CRITICAL: Gateway Timeout: Upstream provider 'Stripe' failed to acknowledge TX_9921
+[2026-01-15T19:06:13.497Z] CONTEXT: Code: PAYMENT_GATEWAY_TIMEOUT, Transaction: TX_9921
+Error: Gateway Timeout: Upstream provider 'Stripe' failed to acknowledge TX_9921
+    at Timeout._onTimeout (/Users/ayomide/Desktop/upskill/logtriage/index.js:14:25)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7)

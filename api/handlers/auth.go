@@ -1,116 +1,212 @@
 package handlers
 
 import (
+	"context"
+	"crypto/rand"
 	"database/sql"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/github"
+	"golang.org/x/oauth2/google"
 )
 
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
-type LoginResponse struct {
-	Token string `json:"token"`
-	Email string `json:"email"`
-}
-
 var db *sql.DB
-
-// SetDB sets the database connection for handlers
 func SetDB(database *sql.DB) {
 	db = database
 }
 
-type RegisterRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+var (
+	githubOauthConfig *oauth2.Config
+	googleOauthConfig *oauth2.Config
+)
+
+func getGithubOauthConfig() *oauth2.Config {
+	if githubOauthConfig != nil {
+		return githubOauthConfig
+	}
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://localhost:8080"
+	}
+	githubOauthConfig = &oauth2.Config{
+		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
+		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
+		RedirectURL:  apiURL + "/auth/github/callback",
+		Scopes:       []string{"user:email"},
+		Endpoint:     github.Endpoint,
+	}
+	return githubOauthConfig
 }
 
-// RegisterHandler handles user registration
-func RegisterHandler(c *gin.Context) {
-	var req RegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request: email must be valid and password at least 6 characters"})
-		return
+func getGoogleOauthConfig() *oauth2.Config {
+	if googleOauthConfig != nil {
+		return googleOauthConfig
 	}
-
-	// Hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process password"})
-		return
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://localhost:8080"
 	}
-
-	// Insert user into database
-	var userID int
-	err = db.QueryRow("INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id",
-		req.Email, string(hashedPassword)).Scan(&userID)
-
-	if err != nil {
-		// Check for duplicate email
-		c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
-		return
+	googleOauthConfig = &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  apiURL + "/auth/google/callback",
+		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+		Endpoint:     google.Endpoint,
 	}
-
-	c.JSON(http.StatusCreated, gin.H{"message": "user registered successfully", "email": req.Email})
+	return googleOauthConfig
 }
 
-// LoginHandler handles user authentication
-func LoginHandler(c *gin.Context) {
-	var req LoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+func generateStateOauthCookie(c *gin.Context) string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	state := base64.URLEncoding.EncodeToString(b)
+	c.SetCookie("oauthstate", state, 600, "/", "", false, true)
+	return state
+}
+func AuthGitHubHandler(c *gin.Context) {
+	state := generateStateOauthCookie(c)
+	url := getGithubOauthConfig().AuthCodeURL(state, oauth2.AccessTypeOffline, oauth2.SetAuthURLParam("prompt", "consent"))
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func AuthGoogleHandler(c *gin.Context) {
+	state := generateStateOauthCookie(c)
+	url := getGoogleOauthConfig().AuthCodeURL(state, oauth2.AccessTypeOffline, oauth2.SetAuthURLParam("prompt", "consent"))
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func verifyState(c *gin.Context) error {
+	stateQuery := c.Query("state")
+	stateCookie, err := c.Cookie("oauthstate")
+	if err != nil {
+		return fmt.Errorf("oauth state cookie missing")
+	}
+	if stateQuery != stateCookie {
+		return fmt.Errorf("invalid oauth state")
+	}
+	return nil
+}
+
+func AuthGitHubCallbackHandler(c *gin.Context) {
+	if err := verifyState(c); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid state parameter. Please try again."})
 		return
 	}
 
-	// Query user from database
-	var userID int
-	var passwordHash string
-	err := db.QueryRow("SELECT id, password_hash FROM users WHERE email = $1", req.Email).
-		Scan(&userID, &passwordHash)
+	// Delete state cookie
+	c.SetCookie("oauthstate", "", -1, "/", "", false, true)
 
-	if err == sql.ErrNoRows {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+	code := c.Query("code")
+	cliPort := c.Query("cli_port")
+	if cliPort == "" {
+		cliPort = "10999"
+	}
+
+	config := getGithubOauthConfig()
+	token, err := config.Exchange(context.Background(), code)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to exchange token"})
 		return
-	} else if err != nil {
+	}
+	client := config.Client(context.Background(), token)
+	resp, err := client.Get("https://api.github.com/user")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user info"})
+		return
+	}
+	defer resp.Body.Close()
+
+	var githubUser struct {
+		ID    int    `json:"id"`
+		Login string `json:"login"`
+		Email string `json:"email"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&githubUser); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to parse user info"})
+		return
+	}
+
+	email := githubUser.Email
+	if email == "" {
+		email = fmt.Sprintf("%s@github.com", githubUser.Login)
+	}
+
+	completeFlow(c, email, "github", fmt.Sprintf("%d", githubUser.ID), cliPort)
+}
+
+func AuthGoogleCallbackHandler(c *gin.Context) {
+	if err := verifyState(c); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid state parameter"})
+		return
+	}
+	c.SetCookie("oauthstate", "", -1, "/", "", false, true)
+
+	code := c.Query("code")
+	cliPort := "10999" // Simplified
+
+	config := getGoogleOauthConfig()
+	token, err := config.Exchange(context.Background(), code)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to exchange token"})
+		return
+	}
+	client := config.Client(context.Background(), token)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user info"})
+		return
+	}
+	defer resp.Body.Close()
+
+	var googleUser struct {
+		ID    string `json:"id"`
+		Email string `json:"email"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&googleUser); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to parse user info"})
+		return
+	}
+
+	completeFlow(c, googleUser.Email, "google", googleUser.ID, cliPort)
+}
+
+func completeFlow(c *gin.Context, email, provider, providerID, cliPort string) {
+	var userID int
+	err := db.QueryRow(`
+		INSERT INTO users (email, provider, provider_id, password_hash) 
+		VALUES ($1, $2, $3, NULL)
+		ON CONFLICT (email) DO UPDATE 
+		SET provider = $2, provider_id = $3
+		RETURNING id`,
+		email, provider, providerID).Scan(&userID)
+
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
 		return
 	}
 
-	// Verify password
-	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
-		return
-	}
-
-	// Generate JWT token
-	token, err := generateJWT(userID, req.Email)
+	jwtToken, err := generateJWT(userID, email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
 		return
 	}
 
-	// Save token to database
-	_, err = db.Exec("INSERT INTO tokens (user_id, token) VALUES ($1, $2)", userID, token)
+	_, err = db.Exec("INSERT INTO tokens (user_id, token) VALUES ($1, $2)", userID, jwtToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save token"})
-		return
+		fmt.Printf("Failed to save token: %v\n", err)
 	}
-
-	c.JSON(http.StatusOK, LoginResponse{
-		Token: token,
-		Email: req.Email,
-	})
+	redirectURL := fmt.Sprintf("http://localhost:%s/callback?token=%s&email=%s", cliPort, jwtToken, email)
+	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 }
 
-// generateJWT creates a JWT token for the user
 func generateJWT(userID int, email string) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
@@ -120,7 +216,7 @@ func generateJWT(userID int, email string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"email":   email,
-		"exp":     time.Now().Add(time.Hour * 24 * 365).Unix(), // 1 year expiry
+		"exp":     time.Now().Add(time.Hour * 24 * 365).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
