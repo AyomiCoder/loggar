@@ -6,7 +6,7 @@ set -e
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="loggar"
 GITHUB_REPO="AyomiCoder/loggar"
-VERSION="latest"
+VERSION="v0.1.0"
 
 echo "Installing Loggar CLI..."
 
