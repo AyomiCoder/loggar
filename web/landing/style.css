@@ -1,0 +1,562 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', -apple-system, sans-serif;
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+header {
+    padding: 2rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: #888;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #fff;
+}
+
+/* ... existing styles ... */
+
+.credits {
+    text-align: center;
+    color: #444;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+.credits a {
+    color: #666;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.credits a:hover {
+    color: #fff;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 100px;
+    width: auto;
+}
+
+.hero {
+    min-height: calc(100vh - 160px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+}
+
+.content {
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+}
+
+h1 {
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 0.95;
+    margin-bottom: 1.5rem;
+}
+
+.tagline {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    font-weight: 300;
+    color: #666;
+    margin-bottom: 3rem;
+    letter-spacing: 0.02em;
+}
+
+.install {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 0 auto 4rem;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.install:hover {
+    border-color: #333;
+    background: #0d0d0d;
+}
+
+.install code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.copy-btn {
+    background: transparent;
+    border: none;
+    color: #444;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.copy-btn:hover {
+    color: #ccc;
+}
+
+.copy-btn.copied {
+    color: #27c93f;
+}
+
+/* Mac Terminal */
+.terminal {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: left;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+}
+
+.terminal-header {
+    background: #0d0d0d;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.terminal-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.dot.red {
+    background: #ff5f56;
+}
+
+.dot.yellow {
+    background: #ffbd2e;
+}
+
+.dot.green {
+    background: #27c93f;
+}
+
+.terminal-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: #444;
+    flex: 1;
+    text-align: center;
+    margin-right: 50px;
+}
+
+.terminal-body {
+    padding: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+    line-height: 1.6;
+    height: 400px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    /* Hide scrollbar for clean look */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* Terminal Colors */
+.dim {
+    color: #666;
+}
+
+.text-green {
+    color: #27c93f;
+}
+
+.text-red {
+    color: #ff5f56;
+}
+
+.text-yellow {
+    color: #ffbd2e;
+}
+
+.text-blue {
+    color: #82aaff;
+}
+
+.text-purple {
+    color: #c792ea;
+}
+
+.text-cyan {
+    color: #89ddff;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.terminal-body::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.line {
+    margin-bottom: 0.25rem;
+}
+
+.prompt {
+    color: #27c93f;
+    margin-right: 0.5rem;
+}
+
+.label {
+    color: #444;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-top: 1rem;
+    display: block;
+}
+
+.label {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.json-output {
+    white-space: pre;
+    display: block;
+    color: #89ddff;
+    /* Punctuation color */
+    line-height: 1.6;
+    font-size: 0.85rem;
+    padding: 1rem 0;
+}
+
+.json-key {
+    color: #82aaff;
+    /* Blue for keys */
+}
+
+.json-string {
+    color: #c3e88d;
+    /* Green for strings */
+}
+
+.json-number {
+    color: #f78c6c;
+    /* Orange for numbers */
+}
+
+.arrow {
+    color: #ff5f56;
+    margin-right: 0.5rem;
+}
+
+.bullet {
+    color: #ffbd2e;
+    margin-right: 0.5rem;
+}
+
+.cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: #ccc;
+    margin-left: 2px;
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Built With Section */
+.built-with {
+    text-align: center;
+    padding-bottom: 2rem;
+}
+
+.built-with p {
+    font-size: 0.7rem;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.tech-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* ... */
+
+footer {
+    padding: 1rem 0;
+    /* border-top removed */
+}
+
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+
+    h1 {
+        margin-bottom: 1rem;
+    }
+
+    .hero {
+        padding: 3rem 0;
+    }
+
+    .install {
+        margin-bottom: 3rem;
+    }
+
+    .terminal-body {
+        padding: 1.25rem;
+    }
+}
+
+/* Docs Page */
+.docs-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.docs-sidebar {
+    width: 250px;
+    background: #000;
+    border-right: 1px solid #1a1a1a;
+    padding: 3rem 2rem;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.docs-sidebar h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2.5rem;
+    letter-spacing: -0.02em;
+}
+
+.back-link {
+    color: #444;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+    display: inline-block;
+    margin-bottom: 2.5rem;
+}
+
+.back-link:hover {
+    color: #888;
+}
+
+.docs-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-link {
+    color: #444;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    padding: 0.5rem 0;
+}
+
+.nav-link:hover {
+    color: #fff;
+    padding-left: 0.25rem;
+}
+
+.docs-main {
+    margin-left: 250px;
+    flex: 1;
+    padding: 6rem 5rem;
+    max-width: 1000px;
+}
+
+.doc-section {
+    margin-bottom: 6rem;
+}
+
+.doc-section h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.doc-text {
+    color: #666;
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.doc-text.dim {
+    color: #444;
+    font-size: 0.85rem;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.command-block {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.command-block code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: #ccc;
+    flex: 1;
+}
+
+.terminal-example {
+    background: #0a0a0a;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2rem 0;
+}
+
+.terminal-example .terminal-header {
+    background: #0d0d0d;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #1a1a1a;
+}
+
+.terminal-example .terminal-body {
+    padding: 1.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+}
+
+.terminal-example .success {
+    color: #27c93f;
+}
+
+@media (max-width: 1024px) {
+    .docs-sidebar {
+        width: 220px;
+        padding: 2.5rem 1.5rem;
+    }
+
+    .docs-main {
+        margin-left: 220px;
+        padding: 4rem 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .docs-sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #1a1a1a;
+        padding: 2rem 1.5rem;
+    }
+
+    .docs-main {
+        margin-left: 0;
+        padding: 3rem 1.5rem;
+    }
+
+    .doc-section {
+        margin-bottom: 4rem;
+    }
+}
