@@ -24,6 +24,10 @@ func InitDB(databaseURL string) error {
 		return err
 	}
 
+	if err = runMigrations(db); err != nil {
+		return err
+	}
+
 	// Set the database for handlers
 	handlers.SetDB(db)
 
