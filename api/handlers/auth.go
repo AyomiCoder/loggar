@@ -35,7 +35,7 @@ func getGithubOauthConfig() *oauth2.Config {
 	}
 	apiURL := os.Getenv("API_URL")
 	if apiURL == "" {
-		apiURL = "https://loggar-ai.onrender.com"
+		apiURL = "https://api.loggar.space"
 	}
 	githubOauthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
@@ -53,7 +53,7 @@ func getGoogleOauthConfig() *oauth2.Config {
 	}
 	apiURL := os.Getenv("API_URL")
 	if apiURL == "" {
-		apiURL = "https://loggar-ai.onrender.com"
+		apiURL = "https://api.loggar.space"
 	}
 	googleOauthConfig = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),

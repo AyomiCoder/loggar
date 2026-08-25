@@ -1,6 +1,6 @@
-# Binaries
-loggar
-triage
+# Binaries (anchored to repo root so they do not match cmd/loggar/)
+/loggar
+/triage
 *.exe
 *.dll
 *.so
