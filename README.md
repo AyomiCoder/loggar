@@ -19,7 +19,7 @@ brew install loggar
 
 ## Documentation
 
-Full documentation available at [loggar.dev/docs](https://loggar.dev/docs.html)
+Full documentation available at [loggar.space/docs](https://loggar.space/docs.html)
 
 ## Contributions
 

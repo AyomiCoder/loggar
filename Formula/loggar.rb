@@ -1,14 +1,14 @@
 class Loggar < Formula
   desc "AI-powered log triage CLI"
-  homepage "https://loggar.dev"
-  version "0.1.0"
-  
+  homepage "https://loggar.space"
+  version "0.2.0"
+
   if Hardware::CPU.arm?
-    url "https://github.com/AyomiCoder/loggar/releases/download/v0.1.0/loggar_darwin_arm64"
-    sha256 "60f69f3e530f0e9e6a4bf5b19f239e50c054e0ee12dc76dc531aad95a72183c3"
+    url "https://github.com/AyomiCoder/loggar/releases/download/v0.2.0/loggar_darwin_arm64"
+    sha256 "a000f900ec608e8c0832110329520af09b5097a58e4126e614e3e706f0e6ed18"
   else
-    url "https://github.com/AyomiCoder/loggar/releases/download/v0.1.0/loggar_darwin_amd64"
-    sha256 "abf13064da336ff2a28b5f7a4fee34071f6e19e895020cc6df1212fb1d5f6d6f"
+    url "https://github.com/AyomiCoder/loggar/releases/download/v0.2.0/loggar_darwin_amd64"
+    sha256 "e5710cc57c3c30e4ee39f907868167813c1669f577d8aee6ec76f21f03bcf600"
   end
 
   def install
